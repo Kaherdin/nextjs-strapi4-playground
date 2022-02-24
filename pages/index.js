@@ -28,39 +28,15 @@ const POSTS = gql`
 export default function Home() {
   const [start, setStart] = useState(0);
   const [limit] = useState(2);
+  const model = "posts";
   const { data, fetchMore } = useQuery(POSTS, {
     variables: { start: 0, limit: limit },
-    // notifyOnNetworkStatusChange: true,
   });
-
-  // const handleMore = () => {
-  //   const nextOffset = offset + 2;
-  //   setOffset(nextOffset);
-  //   console.log(offset, "offset");
-
-  //   // fetchMore({
-  //   //   variables: {
-  //   //     offset,
-  //   //     limit: 2
-  //   //   },
-  //   // });
-  // };
+  const total = data?.posts?.meta?.pagination?.total;
 
   const handleMore = () => {
-    // console.log(start, "start");
-    // console.log(limit, "limit");
-
-    console.log(data, "data");
-
     const nextStart = start + limit;
     setStart(nextStart);
-    console.log(start, "start after");
-    console.log(nextStart, "nextStart after");
-
-    // const nextOffset = offset + limit;
-    // setOffset(10);
-    // console.log(offset, "nextOffset");
-
     fetchMore({
       variables: {
         start: nextStart,
@@ -70,16 +46,6 @@ export default function Home() {
         if (!fetchMoreResult) {
           return prevResult;
         }
-        // console.log(prevResult, "prevResult");
-        // console.log(fetchMoreResult, "fetchMoreResult");
-        // const combined1 = [].concat(prevResult, fetchMoreResult);
-        // return {
-        //   combined1
-        // }
-        // return {
-        //   ...fetchMoreResult,
-        // };
-        const model = "posts";
         const prevData = prevResult[model].data;
         const moreData = fetchMoreResult[model].data;
 
@@ -108,7 +74,7 @@ export default function Home() {
         </ul>
         <button
           type="button"
-          disabled={start + limit >= 7}
+          disabled={start + limit >= total}
           onClick={() => handleMore()}
         >
           More
