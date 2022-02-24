@@ -6,12 +6,12 @@ const API_URL =
 
 const defaultOptions = {
   watchQuery: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "ignore",
+    // fetchPolicy: "no-cache",
+    // errorPolicy: "ignore",
   },
   query: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "all",
+    // fetchPolicy: "no-cache",
+    // errorPolicy: "all",
   },
 };
 
@@ -20,13 +20,10 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  // const userToken = Cookies.get("token");
-
   // return the headers to the context so httpLink can read them
   return {
     headers: {
       ...headers,
-      // authorization: userToken ? `Bearer ${userToken}` : "",
     },
   };
 });
@@ -34,6 +31,22 @@ const authLink = setContext((_, { headers }) => {
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache({}),
+  // cache: new InMemoryCache({
+  //   typePolicies: {
+  //     Query: {
+  //       fields: {
+  //         posts: {
+  //           //Query name
+  //           keyArgs: false,
+  //           // Concatenate prev with new
+  //           merge(existing = [], incoming) {
+  //             return [...existing, ...incoming];
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // }),
   defaultOptions: defaultOptions,
 });
 

@@ -2,10 +2,11 @@ import Head from "next/head";
 import { useQuery } from "@apollo/client";
 import styles from "../styles/Home.module.css";
 import { gql } from "@apollo/client";
+import { useState } from "react";
 
 const POSTS = gql`
-  query posts {
-    posts(pagination: { start: 0, limit: 2 }) {
+  query posts($start: Int) {
+    posts(pagination: { start: $start, limit: 2 }) {
       data {
         id
         attributes {
@@ -18,10 +19,43 @@ const POSTS = gql`
 `;
 
 export default function Home() {
+  const [start, setStart] = useState(2);
   const { data, fetchMore } = useQuery(POSTS, {
     variables: { start: 0, limit: 2 },
     notifyOnNetworkStatusChange: true,
   });
+
+  const handleMore = () => {
+    const nextStart = start + 2;
+    setStart(nextStart);
+
+    fetchMore({
+      variables: {
+        start,
+        limit: 2,
+      },
+      updateQuery: (prevResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return prevResult;
+        }
+        console.log(prevResult, "prevResult");
+        console.log(fetchMoreResult, "fetchMoreResult");
+        // const combined1 = [].concat(prevResult, fetchMoreResult);
+        // return {
+        //   combined1
+        // }
+        // return {
+        //   ...fetchMoreResult,
+        // };
+        const previousEdges = prevResult.posts.data;
+        const fetchMoreEdges = fetchMoreResult.posts.data;
+
+        fetchMoreResult.posts.data = [...previousEdges, ...fetchMoreEdges];
+
+        return { ...fetchMoreResult };
+      },
+    });
+  };
 
   console.log(data, "data");
 
@@ -40,6 +74,9 @@ export default function Home() {
             return <li key={index}>{post?.attributes?.title}</li>;
           })}
         </ul>
+        <button type="button" onClick={() => handleMore()}>
+          More
+        </button>
       </main>
     </div>
   );
