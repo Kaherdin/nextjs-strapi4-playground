@@ -27,8 +27,7 @@ const POSTS = gql`
 
 export default function Home() {
   const [start, setStart] = useState(0);
-  const [limit] = useState(3);
-  const [offset, setOffset] = useState(0);
+  const [limit] = useState(2);
   const { data, fetchMore } = useQuery(POSTS, {
     variables: { start: 0, limit: limit },
     // notifyOnNetworkStatusChange: true,
@@ -50,6 +49,8 @@ export default function Home() {
   const handleMore = () => {
     // console.log(start, "start");
     // console.log(limit, "limit");
+
+    console.log(data, "data");
 
     const nextStart = start + limit;
     setStart(nextStart);
@@ -83,7 +84,6 @@ export default function Home() {
         const moreData = fetchMoreResult[model].data;
 
         fetchMoreResult[model].data = [...prevData, ...moreData];
-        console.log(start, "start atthe end");
         return { ...fetchMoreResult };
       },
     });
@@ -108,7 +108,7 @@ export default function Home() {
         </ul>
         <button
           type="button"
-          disabled={start >= 4}
+          disabled={start + limit >= 7}
           onClick={() => handleMore()}
         >
           More
