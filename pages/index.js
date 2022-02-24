@@ -47,10 +47,11 @@ export default function Home() {
         // return {
         //   ...fetchMoreResult,
         // };
-        const previousEdges = prevResult.posts.data;
-        const fetchMoreEdges = fetchMoreResult.posts.data;
+        const model = "posts";
+        const prevData = prevResult[model].data;
+        const moreData = fetchMoreResult[model].data;
 
-        fetchMoreResult.posts.data = [...previousEdges, ...fetchMoreEdges];
+        fetchMoreResult[model].data = [...prevData, ...moreData];
 
         return { ...fetchMoreResult };
       },

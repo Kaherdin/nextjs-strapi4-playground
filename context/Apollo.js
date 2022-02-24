@@ -6,12 +6,12 @@ const API_URL =
 
 const defaultOptions = {
   watchQuery: {
-    // fetchPolicy: "no-cache",
-    // errorPolicy: "ignore",
+    fetchPolicy: "cache",
+    errorPolicy: "ignore",
   },
   query: {
-    // fetchPolicy: "no-cache",
-    // errorPolicy: "all",
+    fetchPolicy: "no-cache",
+    errorPolicy: "all",
   },
 };
 
