@@ -5,8 +5,8 @@ import { gql } from "@apollo/client";
 import { useState } from "react";
 
 const POSTS = gql`
-  query posts($start: Int) {
-    posts(pagination: { start: $start, limit: 2 }) {
+  query posts($start: Int, $limit: Int) {
+    posts(pagination: { start: $start, limit: $limit }) {
       data {
         id
         attributes {
@@ -14,32 +14,63 @@ const POSTS = gql`
           text
         }
       }
+      meta {
+        pagination {
+          total
+          pageSize
+          pageCount
+        }
+      }
     }
   }
 `;
 
 export default function Home() {
-  const [start, setStart] = useState(2);
+  const [start, setStart] = useState(0);
+  const [limit] = useState(3);
+  const [offset, setOffset] = useState(0);
   const { data, fetchMore } = useQuery(POSTS, {
-    variables: { start: 0, limit: 2 },
-    notifyOnNetworkStatusChange: true,
+    variables: { start: 0, limit: limit },
+    // notifyOnNetworkStatusChange: true,
   });
 
+  // const handleMore = () => {
+  //   const nextOffset = offset + 2;
+  //   setOffset(nextOffset);
+  //   console.log(offset, "offset");
+
+  //   // fetchMore({
+  //   //   variables: {
+  //   //     offset,
+  //   //     limit: 2
+  //   //   },
+  //   // });
+  // };
+
   const handleMore = () => {
-    const nextStart = start + 2;
+    // console.log(start, "start");
+    // console.log(limit, "limit");
+
+    const nextStart = start + limit;
     setStart(nextStart);
+    console.log(start, "start after");
+    console.log(nextStart, "nextStart after");
+
+    // const nextOffset = offset + limit;
+    // setOffset(10);
+    // console.log(offset, "nextOffset");
 
     fetchMore({
       variables: {
-        start,
-        limit: 2,
+        start: nextStart,
+        limit: limit,
       },
       updateQuery: (prevResult, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prevResult;
         }
-        console.log(prevResult, "prevResult");
-        console.log(fetchMoreResult, "fetchMoreResult");
+        // console.log(prevResult, "prevResult");
+        // console.log(fetchMoreResult, "fetchMoreResult");
         // const combined1 = [].concat(prevResult, fetchMoreResult);
         // return {
         //   combined1
@@ -52,13 +83,13 @@ export default function Home() {
         const moreData = fetchMoreResult[model].data;
 
         fetchMoreResult[model].data = [...prevData, ...moreData];
-
+        console.log(start, "start atthe end");
         return { ...fetchMoreResult };
       },
     });
   };
 
-  console.log(data, "data");
+  // console.log(data, "data");
 
   return (
     <div className={styles.container}>
@@ -75,7 +106,11 @@ export default function Home() {
             return <li key={index}>{post?.attributes?.title}</li>;
           })}
         </ul>
-        <button type="button" onClick={() => handleMore()}>
+        <button
+          type="button"
+          disabled={start >= 4}
+          onClick={() => handleMore()}
+        >
           More
         </button>
       </main>
